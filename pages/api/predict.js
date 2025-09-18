@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     const lucky = (parsed.lucky_numbers || []).slice(0, 6).map(n => parseInt(n, 10)).filter(Boolean)
     res.json({ interpretation: parsed.interpretation || parsed.notes || 'ไม่มีคำอธิบาย', lucky_numbers: lucky, confidence: parsed.confidence || 'unknown', raw: parsed })
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'AI service error' })
+    console.error('OpenAI API Error:', err)
+    res.status(500).json({ error: err.message || 'AI service error' })
   }
 }
