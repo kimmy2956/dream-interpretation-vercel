@@ -30,7 +30,7 @@ export default function Home() {
   return (
     <main className="min-h-screen p-6 flex items-center justify-center">
       <div className="w-full max-w-2xl bg-white shadow-xl rounded-2xl p-8">
-        <h1 className="text-2xl font-semibold mb-4">Dream Interpreter + Lucky Numbers</h1>
+        <h1 className="text-2xl font-semibold mb-4">ทำนายฝันและเลขเด็ด</h1>
         <p className="text-sm text-slate-600 mb-6">พิมพ์ความฝันของคุณ แล้วกด "ทำนาย"</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
