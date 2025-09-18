@@ -36,7 +36,7 @@ Optionally include 'notes'.`;
 
     console.log('INFO: Sending request to OpenAI API...');
     const response = await client.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-4',
+      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
