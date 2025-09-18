@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 export default async function handler(req, res) {
   // === Debug: เช็ค Environment Variables ===
   console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY ? 'FOUND' : 'MISSING');
-  console.log('OPENAI_MODEL:', process.env.OPENAI_MODEL || 'DEFAULT gpt-4');
+  console.log('OPENAI_MODEL:', process.env.OPENAI_MODEL || 'DEFAULT gpt-4o-mini');
 
   // ตรวจสอบ API Key
   if (!process.env.OPENAI_API_KEY) {
