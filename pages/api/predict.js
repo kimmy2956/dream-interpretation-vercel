@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 export default async function handler(req, res) {
   // === Debug: เช็ค Environment Variables ===
   console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY ? 'FOUND' : 'MISSING');
-  console.log('OPENAI_MODEL:', process.env.OPENAI_MODEL || 'DEFAULT gpt-4o-mini');
+  console.log('OPENAI_MODEL:', process.env.OPENAI_MODEL || 'DEFAULT gpt-3.5-turbo');
 
   // ตรวจสอบ API Key
   if (!process.env.OPENAI_API_KEY) {
@@ -36,7 +36,7 @@ Optionally include 'notes'.`;
 
     console.log('INFO: Sending request to OpenAI API...');
     const response = await client.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+      model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
