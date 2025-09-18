@@ -74,7 +74,7 @@ export default function Home() {
           )}
         </div>
 
-        <footer className="mt-6 text-xs text-slate-500">หมายเหตุ: ผลลัพธ์เพื่อความบันเทิงเท่านั้น</footer>
+        <footer className="mt-6 text-xs text-slate-500">พัฒนาโดย ธันยรัศมิ์ ประภาจิรสกุล</footer>
       </div>
     </main>
   )
