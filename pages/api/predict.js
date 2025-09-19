@@ -1,22 +1,20 @@
 // pages/api/dream.js
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 
 export default async function handler(req, res) {
-  console.log('GEMINI_API_KEY:', process.env.GEMINI_API_KEY ? 'FOUND' : 'MISSING');
+  console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY ? 'FOUND' : 'MISSING');
 
-  if (!process.env.GEMINI_API_KEY) {
-    console.error('ERROR: GEMINI_API_KEY is missing!');
-    return res.status(500).json({ error: 'GEMINI_API_KEY is missing' });
+  if (!process.env.OPENAI_API_KEY) {
+    console.error('ERROR: OPENAI_API_KEY is missing!');
+    return res.status(500).json({ error: 'OPENAI_API_KEY is missing' });
   }
 
   if (req.method !== 'POST') {
-    console.warn('WARN: Method not allowed', req.method);
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const { dream } = req.body;
   if (!dream || !dream.trim()) {
-    console.warn('WARN: No dream provided');
     return res.status(400).json({ error: 'No dream provided' });
   }
 
@@ -30,30 +28,29 @@ Optionally include 'notes'.`;
 
     const userPrompt = `Dream: ${dream}\nReturn result as JSON.`;
 
-    console.log('INFO: Sending request to Gemini API...');
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const response = await client.chat.completions.create({
+      model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      max_tokens: 400,
+      temperature: 0.8
+    });
 
-    const result = await model.generateContent(systemPrompt + "\n" + userPrompt);
-
-    console.log('INFO: Received response from Gemini');
-
-    const rawText = result.response.text() || '';
-    console.log('DEBUG: rawText:', rawText);
-
-    // แปลง JSON จาก Gemini response
+    const rawText = response.choices?.[0]?.message?.content || '';
     let parsed = null;
+
     try {
       const jsonMatch = String(rawText).match(/\{[\s\S]*\}/);
       if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
-      console.log('DEBUG: Parsed JSON:', parsed);
     } catch (err) {
-      console.error('ERROR: JSON parse failed', err);
+      console.error('JSON parse failed', err);
     }
 
     if (!parsed) {
-      console.warn('WARN: Parsing failed, returning raw text');
       return res.status(200).json({
         interpretation: rawText.slice(0, 1000),
         lucky_numbers: [],
@@ -62,11 +59,8 @@ Optionally include 'notes'.`;
       });
     }
 
-    // lucky_numbers → แปลงเป็นตัวเลข
     let lucky = Array.isArray(parsed.lucky_numbers) ? parsed.lucky_numbers.slice(0, 6) : [];
-    lucky = lucky
-      .map(n => (typeof n === 'number' ? n : parseInt(String(n).replace(/[^0-9]/g, ''), 10)))
-      .filter(Boolean);
+    lucky = lucky.map(n => (typeof n === 'number' ? n : parseInt(String(n).replace(/[^0-9]/g, ''), 10))).filter(Boolean);
 
     return res.status(200).json({
       interpretation: parsed.interpretation || parsed.notes || 'ไม่มีคำอธิบาย',
@@ -76,7 +70,7 @@ Optionally include 'notes'.`;
     });
 
   } catch (err) {
-    console.error('Gemini API Error:', err);
-    return res.status(500).json({ error: err.message || 'Gemini service error', raw: err });
+    console.error('OpenAI API Error:', err);
+    return res.status(500).json({ error: err.message || 'AI service error', raw: err });
   }
 }
